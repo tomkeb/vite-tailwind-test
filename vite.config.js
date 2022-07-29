@@ -1,9 +1,14 @@
-const path = require('path')
+/** @type {import('vite').UserConfig} */
+
+const path = require("path");
+import react from "@vitejs/plugin-react";
 
 export default {
-  root: path.resolve(__dirname, 'src'),
+  plugins: [react()],
+  base: "",
+  root: path.resolve(__dirname, "src"),
   server: {
-    port: 8080,
+    port: 8000,
     hot: true
   },
   build: {
@@ -19,4 +24,4 @@ export default {
       }
     }
   }
-}
+};
