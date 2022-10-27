@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.circle {fill: #9bbaf4;
+    stroke: #144aac;
+    stroke-width: 2px;}
