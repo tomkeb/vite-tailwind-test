@@ -1,58 +1,68 @@
 import { useState } from "react";
+import ParticleInput from "./ParticleInput"
 
 export default function Svg() {
-  const [message, setMessage] = useState(0);
-  let sampleCircleCopies = [];
-  const min = 0;
-  const max = 30;
+  const [formValue, setFormValue] = useState({
+    protons: "",
+    charge: ""
+  });
 
-  const handleChange = (event) => {
-    if (event.target.valueAsNumber > 0) {
-      setMessage(Math.max(min, Math.min(max, Number(event.target.valueAsNumber))));
-    } else {
-      setMessage('');
-    }
+  const { protons, charge } = formValue;
+
+  let electronCopies, protonCopies = [];
+
+  const handleChange = (event, min, max) => {
+    const { name, value } = event.target;
+    setFormValue((prevState) => {
+      if (parseInt(value)) {
+        return {
+          ...prevState,
+          [name]: Math.max(min, Math.min(max, Number(value))),
+        };
+      } else {
+        return {
+          ...prevState,
+          [name]: value,
+        };
+      }
+    });
   };
 
-  if (message){
-  sampleCircleCopies = [...new Array(message)].map((_, i) => (
-    <use
-      href="#originalCircle"
-      x={
-        200 +
-        100 * Math.cos((270 * Math.PI) / 180 + (i * 2 * Math.PI) / message)
-      }
-      y={
-        200 +
-        100 * Math.sin((270 * Math.PI) / 180 + (i * 2 * Math.PI) / message)
-      }
-      key={i}
-    />
-  ));
+
+  if (protons > 0) {
+    protonCopies = [...new Array(protons)].map((_, i) => (
+      <use
+        href="#proton"
+        x={200 + 30 * Math.cos((270 * Math.PI) / 180 + (i * 2 * Math.PI) / protons)}
+        y={200 + 30 * Math.sin((270 * Math.PI) / 180 + (i * 2 * Math.PI) / protons)}
+        key={i}
+      />
+    ));
+    if (protons - charge > 0) {
+      electronCopies = [...new Array(protons - charge)].map((_, i) => (
+        <use
+          href="#electron"
+          x={200 + 100 * Math.cos((270 * Math.PI) / 180 + (i * 2 * Math.PI) / (protons - charge))}
+          y={200 + 100 * Math.sin((270 * Math.PI) / 180 + (i * 2 * Math.PI) / (protons - charge))}
+          key={i}
+        />
+      ));
+    }
   }
 
   return (
     <>
       <svg viewBox="0 0 400 400" style={{ maxWidth: 400, maxHeight: 400 }} className="p-0 border-2 mx-auto">
         <g transform="translate(-1000,-1000)">
-          <circle
-            cx="0"
-            cy="0"
-            r="10"
-            id="originalCircle"
-            className="circle"
-          />
+          <circle cx="0" cy="0" r="10" id="electron" className="electron" />
+          <circle cx="0" cy="0" r="10" id="proton" className="proton" />
         </g>
-        {sampleCircleCopies}
+        {electronCopies}
+        {protonCopies}
       </svg>
       <div>
-        <input
-          type="number"
-          className="border-2 mt-2 p-1 rounded-xl"
-          onChange={(e) => handleChange(e)}
-          value={message}
-        />
-        <h2>Number: {sampleCircleCopies.length}</h2>
+        <ParticleInput particle="protons" onChange={(e) => handleChange(e, 0, 12)} value={protons} />
+        <ParticleInput particle="charge" onChange={(e) => handleChange(e, -protons, protons)} value={charge} />
       </div>
     </>
   );

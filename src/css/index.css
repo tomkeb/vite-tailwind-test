@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-.circle {fill: #9bbaf4;
+.electron {fill: #9bbaf4;
     stroke: #144aac;
     stroke-width: 2px;}
+
+.proton {
+    fill: lightcoral;
+    stroke: maroon;
+    stroke-width: 2px;
+}

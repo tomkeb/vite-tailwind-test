@@ -4,7 +4,7 @@ import Counter from "./components/Counter";
 export default function App() {
   return (
     <>
-      <Counter />
+      {/* <Counter /> */}
       <div className="mx-auto">
         <Svg />
       </div>
