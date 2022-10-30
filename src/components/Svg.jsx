@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ParticleInput from "./ParticleInput"
+import Input from "./Input"
 
 export default function Svg() {
   const [formValue, setFormValue] = useState({
@@ -27,7 +27,6 @@ export default function Svg() {
       }
     });
   };
-
 
   if (protons > 0) {
     protonCopies = [...new Array(protons)].map((_, i) => (
@@ -61,8 +60,8 @@ export default function Svg() {
         {protonCopies}
       </svg>
       <div>
-        <ParticleInput particle="protons" onChange={(e) => handleChange(e, 0, 12)} value={protons} />
-        <ParticleInput particle="charge" onChange={(e) => handleChange(e, -protons, protons)} value={charge} />
+        <Input particle="protons" type="number" onChange={(e) => handleChange(e, 0, 12)} value={protons} />
+        <Input particle="charge" type="number" onChange={(e) => handleChange(e, -protons, protons)} value={charge} />
       </div>
     </>
   );
