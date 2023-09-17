@@ -6,8 +6,6 @@ export default function Form() {
     tasks: '',
     taskStatus: {},
     isCopied: false,
-    taskPlusCounts: {},
-    totalPoints: 0,
   });
 
   const handleTaskChange = (event) => {
@@ -24,47 +22,59 @@ export default function Form() {
   };
 
   const updateTaskStatusAndPoints = (tasks) => {
-    // Split tasks and calculate points based on statuses
     const taskArray = tasks.split('\n').filter((task) => task.trim() !== '');
-    const updatedTaskStatus = { ...taskStatus };
     let totalPoints = 0;
-    let taskPlusCounts = {}; // Store the '+' counts for each task
 
     taskArray.forEach((task) => {
       const taskName = task.trim();
-      const status = updatedTaskStatus[taskName] || 'done'; // Set default state to 'done'
-      updatedTaskStatus[taskName] = status;
+      const status = state.taskStatus[taskName] || 'done'; // Use state.taskStatus to access task status
 
-      const plusCount = (taskName.match(/\+/g) || []).length; // Count '+' symbols
-      taskPlusCounts[taskName] = plusCount; // Store the count for this task
+      const plusCount = (taskName.match(/\+/g) || []).length;
+      const taskPoints = status === 'done'
+        ? plusCount + 1
+        : status === 'partiallyDone'
+          ? (plusCount + 1) / 2
+          : 0;
 
-      if (status === 'done') {
-        totalPoints += plusCount + 1; // 'done' points: count of '+' symbols + 1
-      } else if (status === 'partiallyDone') {
-        totalPoints += (plusCount + 1) / 2; // 'partiallyDone' points: (count of '+' symbols + 1) / 2
-      }
+      totalPoints += taskPoints;
     });
 
     // Update the totalPoints state
     setState((prevState) => ({
       ...prevState,
+      totalPoints: totalPoints,
     }));
   };
 
-
   const setAllTasksStatus = (status) => {
-    const { taskStatus } = state;
+    const { tasks, taskStatus } = state;
+    const taskArray = tasks.split('\n').filter((task) => task.trim() !== '');
+
+    // Create a new task status object with all tasks set to the specified status
     const updatedStatus = {};
+    let totalPoints = 0;
 
-    // Set all tasks to the specified status
-    for (const task in taskStatus) {
-      updatedStatus[task] = status;
-    }
+    taskArray.forEach((task) => {
+      const taskName = task.trim();
+      updatedStatus[taskName] = status;
 
-    // Update the taskStatus and recalculate points
-    setState((prevState) => ({ ...prevState, taskStatus: updatedStatus }));
-    updateTaskStatusAndPoints(state.tasks);
+      const plusCount = (taskName.match(/\+/g) || []).length;
+      const taskPoints = status === 'done'
+        ? plusCount + 1
+        : status === 'partiallyDone'
+          ? (plusCount + 1) / 2
+          : 0;
+
+      totalPoints += taskPoints;
+    });
+
+    setState((prevState) => ({
+      ...prevState,
+      taskStatus: updatedStatus,
+      totalPoints: totalPoints,
+    }));
   };
+
 
 
   const copyTaskList = () => {
@@ -106,96 +116,96 @@ export default function Form() {
 
       {tasks && tasks.trim() !== '' && (
         <>
-      <table>
-        <thead>
-          <tr>
-            <th>kritérium</th>
-            <th>míra splnění</th>
-          </tr>
-        </thead>
-        <tbody>
-          {taskArray.map((task, index) => {
-            const taskName = task.trim();
-            const status = taskStatus[taskName] || 'done'; // Set default state to 'done'
-            return (
-              <tr key={index}>
-                <td>{taskName.replace(/\+/g, '')}</td>
-                <td className="flex gap-2">
-                  <label className="flex gap-1 items-center">
-                    <input
-                      type="radio"
-                      name={`task-${index}`}
-                      value="done"
-                      checked={status === 'done'}
-                      onChange={() => handleStatusChange(taskName, 'done')}
-                    />
-                    splněno
-                  </label>
-                  <label className="flex gap-1 items-center">
-                    <input
-                      type="radio"
-                      name={`task-${index}`}
-                      value="partiallyDone"
-                      checked={status === 'partiallyDone'}
-                      onChange={() => handleStatusChange(taskName, 'partiallyDone')}
-                    />
-                    částečně splněno
-                  </label>
-                  <label className="flex gap-1 items-center">
-                    <input
-                      type="radio"
-                      name={`task-${index}`}
-                      value="notDone"
-                      checked={status === 'notDone'}
-                      onChange={() => handleStatusChange(taskName, 'notDone')}
-                    />
-                    nesplněno
-                  </label>
-                </td>
+          <table>
+            <thead>
+              <tr>
+                <th>kritérium</th>
+                <th>míra splnění</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="mt-3">
-        celkem bodů: {totalPoints !== undefined ? totalPoints.toString().replace('.', ',') : ''}/{taskArray.length + totalPlusCount}
-      </p>
+            </thead>
+            <tbody>
+              {taskArray.map((task, index) => {
+                const taskName = task.trim();
+                const status = taskStatus[taskName] || 'done';
+                return (
+                  <tr key={index}>
+                    <td>{taskName.replace(/\+/g, '')}</td>
+                    <td className="flex gap-2">
+                      <label className="flex gap-1 items-center">
+                        <input
+                          type="radio"
+                          name={`task-${index}`}
+                          value="done"
+                          checked={status === 'done'}
+                          onChange={() => handleStatusChange(taskName, 'done')}
+                        />
+                        splněno
+                      </label>
+                      <label className="flex gap-1 items-center">
+                        <input
+                          type="radio"
+                          name={`task-${index}`}
+                          value="partiallyDone"
+                          checked={status === 'partiallyDone'}
+                          onChange={() => handleStatusChange(taskName, 'partiallyDone')}
+                        />
+                        částečně splněno
+                      </label>
+                      <label className="flex gap-1 items-center">
+                        <input
+                          type="radio"
+                          name={`task-${index}`}
+                          value="notDone"
+                          checked={status === 'notDone'}
+                          onChange={() => handleStatusChange(taskName, 'notDone')}
+                        />
+                        nesplněno
+                      </label>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="mt-3">
+            celkem bodů: {totalPoints !== undefined ? totalPoints.toString().replace('.', ',') : ''}/{taskArray.length + totalPlusCount}
+          </p>
 
-      <div>
-        <p className="task-list-text mt-3">
-          {taskArray.map((task, index) => {
-            const taskName = task.trim();
-            const status = taskStatus[taskName] || 'done'; // Set default state to 'done'
-            const plusCount = (taskName.match(/\+/g) || []).length;
-            const points = status === 'done' ? 'splněno' : (status === 'partiallyDone' ? 'částečně splněno' : 'nesplněno');
+          <div>
+            <p className="task-list-text mt-3">
+              {taskArray.map((task, index) => {
+                const taskName = task.trim();
+                const status = taskStatus[taskName] || 'done';
+                const plusCount = (taskName.match(/\+/g) || []).length;
+                const points = status === 'done' ? 'splněno' : (status === 'partiallyDone' ? 'částečně splněno' : 'nesplněno');
 
-            // Use conditional rendering to add a comma after each task except the last one
-            return (
-              <span key={index}>
-                {index === 0 ? '' : ', '}
-                {taskName.replace(/\+/g, '')} – {points} (
-                {status === 'done'
-                  ? plusCount >= 1
-                    ? `${(plusCount + 1).toString().replace('.', ',')} b.` // Add 1 to the totalPlusCount when 'done'
-                    : '1 b.' // Default 'done' points
-                  : status === 'partiallyDone'
-                    ? plusCount >= 1
-                      ? `${((plusCount + 1) / 2).toString().replace('.', ',')} b.` // Add 1 to the totalPlusCount and divide by 2 when 'partiallyDone'
-                      : '0,5 b.' // Default 'partiallyDone' points
-                    : '0 b.' // Default 'notDone' points
-                })
-              </span>
-            );
-          })}
-        </p>
-      </div>
-      <div className="mt-3 flex gap-1 flex-wrap">
-        <Button buttonText='vše splněno' onClick={() => setAllTasksStatus('done')}/>
-        <Button buttonText='vše částečně splněno' onClick={() => setAllTasksStatus('partiallyDone')}/>
-        <Button buttonText='vše nesplněno' onClick={() => setAllTasksStatus('notDone')}/>
-        <Button onClick={copyTaskList} buttonText={isCopied ? 'zkopírováno!' : 'zkopíruj výpis'} disabled={isCopied} />
-        </div>
+                return (
+                  <span key={index}>
+                    {index === 0 ? '' : ', '}
+                    {taskName.replace(/\+/g, '')} – {points} (
+                    {status === 'done'
+                      ? plusCount >= 1
+                        ? `${(plusCount + 1).toString().replace('.', ',')} b.`
+                        : '1 b.'
+                      : status === 'partiallyDone'
+                        ? plusCount >= 1
+                          ? `${((plusCount + 1) / 2).toString().replace('.', ',')} b.`
+                          : '0,5 b.'
+                        : '0 b.'
+                    })
+                  </span>
+                );
+              })}
+            </p>
+          </div>
+          <div className="mt-3 flex gap-1 flex-wrap">
+            <Button buttonText='vše splněno' onClick={() => setAllTasksStatus('done')} />
+            <Button buttonText='vše částečně splněno' onClick={() => setAllTasksStatus('partiallyDone')} />
+            <Button buttonText='vše nesplněno' onClick={() => setAllTasksStatus('notDone')} />
+            <Button onClick={copyTaskList} buttonText={isCopied ? 'zkopírováno!' : 'zkopíruj výpis'} disabled={isCopied} />
+          </div>
         </>
       )}
-    </div>)
+    </div>
+  );
 }

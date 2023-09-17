@@ -1,25 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 
-const plugin = require('tailwindcss/plugin')
+import plugin from 'tailwindcss/plugin'
 
-module.exports = {
-  content: [
-    "./src/index.html",
-    "./src/components/*.jsx"
-  ],
-  theme: {
-    container: {
-      center: true,
-    },
-    extend: {},
+export const content = [
+  "./src/index.html",
+  "./src/components/*.jsx"
+]
+export const theme = {
+  container: {
+    center: true,
   },
-  plugins: [
-    plugin(function({ addBase, theme }) {
-      addBase({
-        'h1': { fontSize: theme('fontSize.2xl'), fontWeight: theme('fontWeight.bold')},
-        'h2': { fontSize: theme('fontSize.xl'), fontWeight: theme('fontWeight.bold') },
-        'h3': { fontSize: theme('fontSize.lg'), fontWeight: theme('fontWeight.bold') },
-      })
-    })
-  ]
+  extend: {},
 }
+export const plugins = [
+  plugin(function ({ addBase, theme }) {
+    addBase({
+      'h1': { fontSize: theme('fontSize.2xl'), fontWeight: theme('fontWeight.bold') },
+      'h2': { fontSize: theme('fontSize.xl'), fontWeight: theme('fontWeight.bold') },
+      'h3': { fontSize: theme('fontSize.lg'), fontWeight: theme('fontWeight.bold') },
+    })
+  })
+]
